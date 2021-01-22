@@ -1,6 +1,5 @@
 name: ranker
-description: A flutter application to create a list of your favourites by
-  pairwise comparison
+description: A flutter application to create a list of your favourite songs by pairwise comparison
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
