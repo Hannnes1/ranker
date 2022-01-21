@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   stacked: ^2.2.8
   stacked_services: ^0.8.16
+  path_provider: ^2.0.8
 
 dev_dependencies:
   flutter_test:
