@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ranker/models/json.dart';
 import 'package:ranker/ui/view/home/home_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 
@@ -18,7 +19,7 @@ class HomeView extends StatelessWidget {
               )
             : Column(
                 children: [
-                  StreamBuilder<List<Map>>(
+                  StreamBuilder<List<Artist>>(
                     stream: model.artistController.stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -27,13 +28,13 @@ class HomeView extends StatelessWidget {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             return ListTile(
-                              title: Text(snapshot.data![index]['artist'] ?? ''),
+                              title: Text(snapshot.data![index].name),
                               onTap: () => model.goToComparison(snapshot.data![index]),
                               trailing: IconButton(
                                   icon: const Icon(Icons.delete),
                                   color: Theme.of(context).colorScheme.error,
                                   onPressed: () => model.loadArtists(
-                                        remove: snapshot.data![index]['artist'],
+                                        remove: snapshot.data![index].name,
                                       )),
                             );
                           },

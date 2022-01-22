@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ranker/models/json.dart';
 import 'package:ranker/services/file_io.dart';
 import 'package:stacked/stacked.dart';
 import 'package:ranker/app/app.locator.dart';
@@ -9,17 +10,18 @@ import 'package:ranker/app/app.router.dart';
 class HomeViewModel extends BaseViewModel {
   final FileIO _fileIO = locator<FileIO>();
   final NavigationService _navigationService = locator<NavigationService>();
-  StreamController<List<Map>> artistController = StreamController<List<Map>>();
+  StreamController<List<Artist>> artistController = StreamController<List<Artist>>();
 
   void init() {
     loadArtists();
   }
 
   Future<void> loadArtists({String? remove}) async {
-    final artists = <Map>[];
+    final artists = <Artist>[];
     List<String> artistNames;
+
     if (remove != null) {
-      artistNames = await _fileIO.removeArtist(remove) ?? [];
+      artistNames = (await _fileIO.removeArtist(remove)).map((e) => e.name).toList();
     } else {
       artistNames = await _fileIO.readArtistNames();
     }
@@ -29,7 +31,7 @@ class HomeViewModel extends BaseViewModel {
     artistController.add(artists);
   }
 
-  Future<void> goToComparison(Map artist) async {
+  Future<void> goToComparison(Artist artist) async {
     await _navigationService.navigateTo(Routes.comparisonView, arguments: ComparisonViewArguments(artist: artist));
 
     loadArtists();

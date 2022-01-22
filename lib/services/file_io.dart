@@ -2,93 +2,88 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:ranker/models/json.dart';
 
 /// Read / write to files.
 class FileIO {
-  // Get the path to the document directory.
+  /// Cached content of the artists file.
+  ///
+  /// This should not be accessed directly. Use [_root] instead.
+  Root? _cache;
+
+  /// The entire JSON file.
+  Future<Root> get _root async {
+    if (_cache == null) {
+      final file = File('${await _localPath}/artists.json');
+
+      try {
+        _cache = Root.fromJson(jsonDecode(await file.readAsString()));
+      } on FileSystemException {
+        _cache = Root(artists: []);
+      }
+    }
+
+    return _cache!;
+  }
+
+  /// Save artists to a json file and cache it.
+  Future<Root> saveArtistsFile(Root root) async {
+    final file = File('${await _localPath}/artists.json');
+
+    // Create the file if it doesn't exist.
+    await file.create();
+
+    file.writeAsString(json.encode(root.toJson()));
+
+    _cache = root;
+    return root;
+  }
+
+  /// Get the path to the directory where the local JSON file is stored.
   Future<String> get _localPath async {
     Directory? directory;
     if (Platform.isIOS) {
       // TODO: Make this available to the user.
       directory = await getApplicationDocumentsDirectory();
-    }else if (Platform.isAndroid) {
+    } else if (Platform.isAndroid) {
       directory = await getExternalStorageDirectory();
     }
 
-    if(directory == null) {
+    if (directory == null) {
       // TODO: Handle this error with a dialog.
       throw Exception('Could not get directory.');
-    }else{
+    } else {
       return directory.path;
     }
   }
 
-  /// Saves an artist and its content as json to a file with
-  /// the same name as the artist.
-  Future<File?> saveArtist(
-      String artist, List<String> albums, Map<String, Map<String, String?>> songs, List<String> winHistory) async {
-    final path = await _localPath;
-    final file = File('$path/artists/$artist.json');
-    const encoder = JsonEncoder.withIndent('  ');
+  /// Saves an artist and its songs and albums to a local JSON file.
+  Future<void> saveArtist(Artist artist, List<String> winHistory) async {
+    final root = await _root;
+    final artists = root.artists;
 
-    final json = {
-      'artist': artist,
-      'albums': albums,
-      'songs': songs,
-      'winHistory': winHistory,
-    };
+    // Remove old artist to avoid duplicates.
+    artists.removeWhere((e) => e.name == artist.name);
 
-    final jsonString = encoder.convert(json);
-    Directory('$path/artists').createSync(recursive: true);
-    try {
-      return file.writeAsString(jsonString);
-    } catch (e) {
-      print(e);
-      return null;
-    }
+    artists.add(artist);
+
+    await saveArtistsFile(root.copyWith(artists: artists));
   }
 
-  Future<Map<String, dynamic>> readArtist(String artist) async {
-    try {
-      final path = await _localPath;
-      final file = File('$path/artists/$artist.json');
-
-      final jsonString = await file.readAsString();
-      return jsonDecode(jsonString);
-    } catch (e) {
-      // TODO: Return empty artist map
-      print(e);
-      return {};
-    }
+  Future<Artist> readArtist(String artist) async {
+    return (await _root).artists.firstWhere((e) => e.name == artist);
   }
 
   Future<List<String>> readArtistNames() async {
-    final path = await _localPath;
-
-    late final List<FileSystemEntity> files;
-
-    try {
-      files = Directory('$path/artists').listSync();
-    } catch (e) {
-      print(e);
-      files = [];
-    }
-
-    final artistNames = <String>[];
-    for (final file in files) {
-      artistNames.add(
-          file.path.toString().replaceFirst(file.parent.path.toString() + '/', '').replaceAll(RegExp(r'\.json$'), ''));
-    }
-    return artistNames;
+    return (await _root).artists.map((e) => e.name).toList();
   }
 
-  Future<List<String>?> removeArtist(String artist) async {
-    final path = await _localPath;
-    try {
-      await File('$path/artists/$artist.json').delete();
-      return await readArtistNames();
-    } catch (e) {
-      return null;
-    }
+  Future<List<Artist>> removeArtist(String artist) async {
+    final root = await _root;
+    final artists = root.artists;
+
+    artists.removeWhere((e) => e.name == artist);
+
+    return (await saveArtistsFile(root.copyWith(artists: artists))).artists;
   }
 }

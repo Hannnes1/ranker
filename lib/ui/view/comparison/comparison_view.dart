@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ranker/models/json.dart';
 import 'package:ranker/ui/view/comparison/comparison_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 
@@ -8,7 +9,7 @@ class ComparisonView extends StatelessWidget {
     required this.artist,
   }) : super(key: key);
 
-  final Map artist;
+  final Artist artist;
 
   @override
   Widget build(BuildContext context) {

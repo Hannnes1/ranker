@@ -30,7 +30,7 @@ class ArtistInputView extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Add a new song with a'),
-                  trailing: DropdownButton(
+                  trailing: DropdownButton<String>(
                     items: const [
                       DropdownMenuItem<String>(
                         value: '\n',
@@ -53,7 +53,7 @@ class ArtistInputView extends StatelessWidget {
                         child: Text('space'),
                       ),
                     ],
-                    onChanged: (value) => model.changeSplitPattern(value),
+                    onChanged: (value) => model.splitPattern = value!,
                     value: model.splitPattern,
                   ),
                 ),
@@ -107,9 +107,8 @@ class ArtistInputView extends StatelessWidget {
                             ),
                             maxLines: null,
                             keyboardType: TextInputType.multiline,
-                            onSaved: (value) => model.songsOnSaved(index, value!),
                             validator: (value) => value == null || value.isEmpty
-                                ? 'Please enter a song'
+                                ? 'Please enter at least one song'
                                 : null,
                           ),
                         ],

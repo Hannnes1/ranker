@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked/stacked_annotations.dart';
 
+import '../models/json.dart';
 import '../ui/view/artist_input/artist_input_view.dart';
 import '../ui/view/comparison/comparison_view.dart';
 import '../ui/view/home/home_view.dart';
@@ -68,6 +69,6 @@ class StackedRouter extends RouterBase {
 /// ComparisonView arguments holder class
 class ComparisonViewArguments {
   final Key? key;
-  final Map<dynamic, dynamic> artist;
+  final Artist artist;
   ComparisonViewArguments({this.key, required this.artist});
 }

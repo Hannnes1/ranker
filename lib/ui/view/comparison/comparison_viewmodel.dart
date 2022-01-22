@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:ranker/models/json.dart';
 import 'package:ranker/services/file_io.dart';
 import 'package:stacked/stacked.dart';
 import 'package:ranker/app/app.locator.dart';
 
 class ComparisonViewModel extends BaseViewModel {
-  ComparisonViewModel(this.artist);
+  ComparisonViewModel(this.artist) : _winHistory = List<String>.from(artist.winHistory);
 
   final FileIO _fileIO = locator<FileIO>();
 
@@ -17,24 +18,24 @@ class ComparisonViewModel extends BaseViewModel {
   /// The number of comparisons that have been shown to the user.
   int comparisonCount = 0;
 
+  /// The artist with the songs to sort.
+  final Artist artist;
+
+  /// Get all of the songs as a flat list.
+  List<Song> get songs => artist.albums.expand((album) => album.songs).toList();
+
   /// The history of songs that the user has selected.
   ///
   /// Since the list that mergeSort uses will be the same each time,
   /// this history can be used to sort the songs without user input.
-  List<String> _winHistory = [];
-
-  /// The artist with the songs to sort.
-  final Map artist;
+  final List<String> _winHistory;
 
   /// Number of songs that haven't been sorted yet.
   int unsorted = 0;
 
-  /// Save the artist and get the first songs to compare.
+  /// Get the first songs to compare.
   void init() {
-    setBusy(true);
-    _winHistory = artist['winHistory'].map<String>((song) => song as String).toList();
     _getNewSongs();
-    setBusy(false);
   }
 
   /// Sort has long as sortCount is less than `_winHistory.length`, then get two new songs.
@@ -48,10 +49,7 @@ class ComparisonViewModel extends BaseViewModel {
     unsorted = 0;
 
     // Create a temporary list to sort, so that the original list is unchanged.
-    final sortingList = <String>[];
-    for (final song in artist['songs'].keys.toList()) {
-      sortingList.add(song);
-    }
+    final sortingList = List<String>.from(songs.map((song) => song.name));
 
     // Sort songs by comparing the songs in _winHistory with a and b, then get two new songs
     mergeSort<String>(sortingList, compare: (a, b) {
@@ -84,17 +82,27 @@ class ComparisonViewModel extends BaseViewModel {
   /// When the user comes back the history of winners can be loaded again to prevent loss of progress.
   /// If all songs have been sorted, pass in that list as `sortedList` to save the position of each song.
   saveProgress({List<String>? sortedList}) {
-    // Add songs to the type of map that is required by the function that saves the artist to a file.
-    final songs = <String, Map<String, String?>>{};
-    for (var i = 0; i < artist['songs'].keys.length; i++) {
-      final String song = artist['songs'].keys.toList()[i];
-      songs[song] = {
-        'album': artist['songs'][song]['album'],
-        // Save the songs position in the fully sorted list of songs if it exist.
-        'position': sortedList?.reversed.toList().indexOf(song).toString(),
-      };
+    var updatedArtist = artist;
+
+    // Create a new artist with updated song positions, if any.
+    if (sortedList != null) {
+      updatedArtist = Artist(
+        name: artist.name,
+        albums: artist.albums
+            .map((album) => Album(
+                  name: album.name,
+                  songs: album.songs
+                      .map((song) => Song(
+                            name: song.name,
+                            position: sortedList.reversed.toList().indexOf(song.name),
+                          ))
+                      .toList(),
+                ))
+            .toList(),
+      );
     }
-    _fileIO.saveArtist(artist['artist'], artist['albums'].cast<String>(), songs, _winHistory);
+
+    _fileIO.saveArtist(updatedArtist, _winHistory);
   }
 
   /// Register `selection` as the winner and use that to sort all the songs.

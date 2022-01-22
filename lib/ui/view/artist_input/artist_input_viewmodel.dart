@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ranker/app/extenstions.dart';
+import 'package:ranker/models/json.dart';
 import 'package:ranker/services/file_io.dart';
 import 'package:stacked/stacked.dart';
 import 'package:ranker/app/app.locator.dart';
@@ -6,66 +8,52 @@ import 'package:ranker/app/app.locator.dart';
 class ArtistInputViewModel extends BaseViewModel {
   final FileIO _fileIO = locator<FileIO>();
 
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _artistController = TextEditingController();
-  final List<TextEditingController> _albumControllers = [TextEditingController()];
-  final List<TextEditingController> _songControllers = [TextEditingController()];
+  final formKey = GlobalKey<FormState>();
+  final TextEditingController artistController = TextEditingController();
+  final List<TextEditingController> albumControllers = [TextEditingController()];
+  final List<TextEditingController> songControllers = [TextEditingController()];
 
   /// How the list of songs should be converted to a list.
   String _splitPattern = '\n';
 
-  Map<String, Map<String, String?>>? _songs;
-
-  get formKey => _formKey;
-
-  get splitPattern => _splitPattern;
-
-  get artistController => _artistController;
-
-  get songControllers => _songControllers;
-
-  get albumControllers => _albumControllers;
-
-  changeSplitPattern(value) {
+  set splitPattern(String value) {
     _splitPattern = value;
     notifyListeners();
   }
 
+  String get splitPattern => _splitPattern;
+
   save() async {
-    // Assert song list is empty before adding songs.
-    _songs = {};
-    _formKey.currentState!.save();
-    final albums = <String>[];
-    for (final album in _albumControllers) {
-      albums.add(album.text);
-    }
-    final file = await _fileIO.saveArtist(_artistController.text, albums, _songs!, []);
-    print(file);
-  }
+    if (formKey.currentState!.validate()) {
+      final artist = Artist(
+        name: artistController.text,
+        albums: albumControllers
+            .mapWithIndex<Album>((index, controller) => Album(
+                  name: controller.text,
+                  songs: songControllers[index]
+                      .text
+                      .split(_splitPattern)
+                      .map((song) => Song(
+                            name: song,
+                          ))
+                      .toList(),
+                ))
+            .toList(),
+      );
 
-  songsOnSaved(int index, String value) {
-    final songList = value.split(_splitPattern);
-
-    // Add non-empty songs to list of songs.
-    for (final song in songList) {
-      if (song.trim().isNotEmpty) {
-        _songs?[song.trim()] = {
-          'album': _albumControllers[index].text,
-          'position': null,
-        };
-      }
+      await _fileIO.saveArtist(artist, []);
     }
   }
 
   removeAlbum(int index) {
-    _albumControllers.removeAt(index);
-    _songControllers.removeAt(index);
+    albumControllers.removeAt(index);
+    songControllers.removeAt(index);
     notifyListeners();
   }
 
   addAlbum() {
-    _albumControllers.add(TextEditingController());
-    _songControllers.add(TextEditingController());
+    albumControllers.add(TextEditingController());
+    songControllers.add(TextEditingController());
     notifyListeners();
   }
 }
