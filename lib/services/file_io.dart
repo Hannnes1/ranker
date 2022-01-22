@@ -7,9 +7,20 @@ import 'package:path_provider/path_provider.dart';
 class FileIO {
   // Get the path to the document directory.
   Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory? directory;
+    if (Platform.isIOS) {
+      // TODO: Make this available to the user.
+      directory = await getApplicationDocumentsDirectory();
+    }else if (Platform.isAndroid) {
+      directory = await getExternalStorageDirectory();
+    }
 
-    return directory.path;
+    if(directory == null) {
+      // TODO: Handle this error with a dialog.
+      throw Exception('Could not get directory.');
+    }else{
+      return directory.path;
+    }
   }
 
   /// Saves an artist and its content as json to a file with

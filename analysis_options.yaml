@@ -8,10 +8,16 @@ linter:
     omit_local_variable_types: true
     prefer_final_locals: true
     prefer_final_in_for_each: true
-
+      
+  
 analyzer:
   exclude: 
     - "**/*.mocks.dart"
     - "**/app.locator.dart"
     - "**/app.router.dart"
     - "**/app.logger.dart"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  
+  errors:
+    invalid_annotation_target: ignore

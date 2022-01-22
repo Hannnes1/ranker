@@ -1,0 +1,58 @@
+{
+    "win_history": [
+        "AC/DC"
+    ],
+    "artists": [
+        {
+            "name": "The Beatles",
+            "position": 2,
+            "win_history": [
+                "Abbey Road"
+            ],
+            "albums": [
+                {
+                    "name": "Abbey Road",
+                    "position": 1,
+                    "win_history": [
+                        "Come Together"
+                    ],
+                    "songs": [
+                        {
+                            "name": "Come Together",
+                            "position": 1
+                        },
+                        {
+                            "name": "Yellow Submarine",
+                            "position": 2
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "AC/DC",
+            "position": 1,
+            "win_history": [
+                "Back in Black"
+            ],
+            "albums": [
+                {
+                    "name": "Back in Black",
+                    "win_history": [
+                        "Thunderstruck"
+                    ],
+                    "songs": [
+                        {
+                            "name": "Hells Bells",
+                            "position": 2
+                        },
+                        {
+                            "name": "Thunderstruck",
+                            "position": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
