@@ -28,7 +28,7 @@ class FileIO {
     };
 
     final jsonString = encoder.convert(json);
-    Directory('$path/artists').createSync();
+    Directory('$path/artists').createSync(recursive: true);
     try {
       return file.writeAsString(jsonString);
     } catch (e) {
