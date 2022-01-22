@@ -48,8 +48,13 @@ class ComparisonView extends StatelessWidget {
                         ),
                       ],
                     )
-                  : const Center(
-                      child: Text('You are done'),
+                  : ListView.builder(
+                      itemCount: model.songs.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(model.sortedSongs[index].name),
+                        );
+                      },
                     ),
         ),
       ),

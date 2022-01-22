@@ -24,6 +24,14 @@ class ComparisonViewModel extends BaseViewModel {
   /// Get all of the songs as a flat list.
   List<Song> get songs => artist.albums.expand((album) => album.songs).toList();
 
+  List<Song>? _sortedSongs;
+
+  List<Song> get sortedSongs {
+    _sortedSongs ??= songs..sort((a, b) => ((a.position ?? 0) > (b.position ?? 0)) ? 1 : -1);
+
+    return _sortedSongs!;
+  }
+
   /// The history of songs that the user has selected.
   ///
   /// Since the list that mergeSort uses will be the same each time,
@@ -88,6 +96,7 @@ class ComparisonViewModel extends BaseViewModel {
     if (sortedList != null) {
       updatedArtist = Artist(
         name: artist.name,
+        winHistory: _winHistory,
         albums: artist.albums
             .map((album) => Album(
                   name: album.name,
@@ -102,7 +111,7 @@ class ComparisonViewModel extends BaseViewModel {
       );
     }
 
-    _fileIO.saveArtist(updatedArtist, _winHistory);
+    _fileIO.saveArtist(updatedArtist);
   }
 
   /// Register `selection` as the winner and use that to sort all the songs.

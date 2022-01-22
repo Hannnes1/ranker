@@ -58,7 +58,7 @@ class FileIO {
   }
 
   /// Saves an artist and its songs and albums to a local JSON file.
-  Future<void> saveArtist(Artist artist, List<String> winHistory) async {
+  Future<void> saveArtist(Artist artist) async {
     final root = await _root;
     final artists = root.artists;
 

@@ -41,7 +41,7 @@ class ArtistInputViewModel extends BaseViewModel {
             .toList(),
       );
 
-      await _fileIO.saveArtist(artist, []);
+      await _fileIO.saveArtist(artist);
     }
   }
 
