@@ -1,61 +1,66 @@
 import 'package:flutter/foundation.dart';
-import 'package:ranker/enums/view_state.dart';
-import 'package:ranker/locator.dart';
+import 'package:ranker/models/json.dart';
 import 'package:ranker/services/file_io.dart';
-import 'package:ranker/viewmodels/base_model.dart';
+import 'package:stacked/stacked.dart';
+import 'package:ranker/app/app.locator.dart';
 
-class ComparisonModel extends BaseModel {
+class ComparisonViewModel extends BaseViewModel {
+  ComparisonViewModel(this.artist) : _winHistory = List<String>.from(artist.winHistory);
+
   final FileIO _fileIO = locator<FileIO>();
 
   /// The song in the left button.
-  String song1;
+  late String song1;
 
   /// The song in the right button.
-  String song2;
+  late String song2;
 
   /// The number of comparisons that have been shown to the user.
   int comparisonCount = 0;
+
+  /// The artist with the songs to sort.
+  final Artist artist;
+
+  /// Get all of the songs as a flat list.
+  List<Song> get songs => artist.albums.expand((album) => album.songs).toList();
+
+  List<Song>? _sortedSongs;
+
+  List<Song> get sortedSongs {
+    _sortedSongs ??= songs..sort((a, b) => ((a.position ?? 0) > (b.position ?? 0)) ? 1 : -1);
+
+    return _sortedSongs!;
+  }
 
   /// The history of songs that the user has selected.
   ///
   /// Since the list that mergeSort uses will be the same each time,
   /// this history can be used to sort the songs without user input.
-
-  List<String> _winHistory = [];
-
-  /// The artist with the songs to sort.
-  Map _artist;
+  final List<String> _winHistory;
 
   /// Number of songs that haven't been sorted yet.
   int unsorted = 0;
 
-  /// Save the artist and get the first songs to compare.
-  void init(Map artist) {
-    setState(ViewState.Busy);
-    _artist = artist;
-    _winHistory = artist['winHistory'].map<String>((song) => song as String).toList();
+  /// Get the first songs to compare.
+  void init() {
     _getNewSongs();
   }
 
   /// Sort has long as sortCount is less than `_winHistory.length`, then get two new songs.
   _getNewSongs() {
-    setState(ViewState.Busy);
     comparisonCount++;
 
     // The number of comparisons the mergeSort function have done.
-    int sortCount = 0;
+    var sortCount = 0;
 
     // Reset unsorted each time getNewSongs is called.
     unsorted = 0;
 
     // Create a temporary list to sort, so that the original list is unchanged.
-    List<String> sortingList = [];
-    for (String song in _artist['songs'].keys.toList()) {
-      sortingList.add(song);
-    }
+    final sortingList = List<String>.from(songs.map((song) => song.name));
 
     // Sort songs by comparing the songs in _winHistory with a and b, then get two new songs
-    mergeSort(sortingList, compare: (a, b) {
+    mergeSort<String>(sortingList, compare: (a, b) {
       if (sortCount < _winHistory.length) {
         if (_winHistory[sortCount] == a) {
           sortCount++;
@@ -67,7 +72,6 @@ class ComparisonModel extends BaseModel {
       } else if (sortCount == _winHistory.length) {
         song1 = a;
         song2 = b;
-        setState(ViewState.Idle);
       }
       sortCount++;
       unsorted++;
@@ -78,7 +82,6 @@ class ComparisonModel extends BaseModel {
     if (unsorted == 0) {
       // Save the sorted songs.
       saveProgress(sortedList: sortingList);
-      setState(ViewState.Idle);
     }
   }
 
@@ -86,24 +89,36 @@ class ComparisonModel extends BaseModel {
   ///
   /// When the user comes back the history of winners can be loaded again to prevent loss of progress.
   /// If all songs have been sorted, pass in that list as `sortedList` to save the position of each song.
-  saveProgress({List<String> sortedList}) {
-    // Add songs to the type of map that is required by the function that saves the artist to a file.
-    Map<String, Map<String, String>> songs = {};
-    for (int i = 0; i < _artist['songs'].keys.length; i++) {
-      String song = _artist['songs'].keys.toList()[i];
-      songs[song] = {
-        'album': _artist['songs'][song]['album'],
-        // Save the songs position in the fully sorted list of songs if it exist.
-        'position': sortedList?.reversed?.toList()?.indexOf(song)?.toString(),
-      };
+  saveProgress({List<String>? sortedList}) {
+    var updatedArtist = artist;
+
+    // Create a new artist with updated song positions, if any.
+    if (sortedList != null) {
+      updatedArtist = Artist(
+        name: artist.name,
+        winHistory: _winHistory,
+        albums: artist.albums
+            .map((album) => Album(
+                  name: album.name,
+                  songs: album.songs
+                      .map((song) => Song(
+                            name: song.name,
+                            position: sortedList.reversed.toList().indexOf(song.name),
+                          ))
+                      .toList(),
+                ))
+            .toList(),
+      );
     }
-    _fileIO.saveArtist(_artist['artist'], _artist['albums'].cast<String>(), songs, _winHistory);
+
+    _fileIO.saveArtist(updatedArtist);
   }
 
   /// Register `selection` as the winner and use that to sort all the songs.
   sort(String selection) {
     _winHistory.add(selection);
     _getNewSongs();
+    notifyListeners();
   }
 
   undo() {
