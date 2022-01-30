@@ -528,9 +528,10 @@ Song _$SongFromJson(Map<String, dynamic> json) {
 class _$SongTearOff {
   const _$SongTearOff();
 
-  _Song call({required String name, int? position}) {
+  _Song call({required String name, required int order, int? position}) {
     return _Song(
       name: name,
+      order: order,
       position: position,
     );
   }
@@ -547,6 +548,12 @@ const $Song = _$SongTearOff();
 mixin _$Song {
   String get name => throw _privateConstructorUsedError;
 
+  /// The order of the song when comparing.
+  ///
+  /// This is used to randomize the order and to avoid that the user finds
+  /// patterns in the list.
+  int get order => throw _privateConstructorUsedError;
+
   /// The rank of the song among all of the artist's songs.
   ///
   /// Will be null if ranking is not completed.
@@ -561,7 +568,7 @@ mixin _$Song {
 abstract class $SongCopyWith<$Res> {
   factory $SongCopyWith(Song value, $Res Function(Song) then) =
       _$SongCopyWithImpl<$Res>;
-  $Res call({String name, int? position});
+  $Res call({String name, int order, int? position});
 }
 
 /// @nodoc
@@ -575,6 +582,7 @@ class _$SongCopyWithImpl<$Res> implements $SongCopyWith<$Res> {
   @override
   $Res call({
     Object? name = freezed,
+    Object? order = freezed,
     Object? position = freezed,
   }) {
     return _then(_value.copyWith(
@@ -582,6 +590,10 @@ class _$SongCopyWithImpl<$Res> implements $SongCopyWith<$Res> {
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      order: order == freezed
+          ? _value.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as int,
       position: position == freezed
           ? _value.position
           : position // ignore: cast_nullable_to_non_nullable
@@ -595,7 +607,7 @@ abstract class _$SongCopyWith<$Res> implements $SongCopyWith<$Res> {
   factory _$SongCopyWith(_Song value, $Res Function(_Song) then) =
       __$SongCopyWithImpl<$Res>;
   @override
-  $Res call({String name, int? position});
+  $Res call({String name, int order, int? position});
 }
 
 /// @nodoc
@@ -610,6 +622,7 @@ class __$SongCopyWithImpl<$Res> extends _$SongCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = freezed,
+    Object? order = freezed,
     Object? position = freezed,
   }) {
     return _then(_Song(
@@ -617,6 +630,10 @@ class __$SongCopyWithImpl<$Res> extends _$SongCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      order: order == freezed
+          ? _value.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as int,
       position: position == freezed
           ? _value.position
           : position // ignore: cast_nullable_to_non_nullable
@@ -628,12 +645,19 @@ class __$SongCopyWithImpl<$Res> extends _$SongCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$_Song implements _Song {
-  _$_Song({required this.name, this.position});
+  _$_Song({required this.name, required this.order, this.position});
 
   factory _$_Song.fromJson(Map<String, dynamic> json) => _$$_SongFromJson(json);
 
   @override
   final String name;
+  @override
+
+  /// The order of the song when comparing.
+  ///
+  /// This is used to randomize the order and to avoid that the user finds
+  /// patterns in the list.
+  final int order;
   @override
 
   /// The rank of the song among all of the artist's songs.
@@ -643,7 +667,7 @@ class _$_Song implements _Song {
 
   @override
   String toString() {
-    return 'Song(name: $name, position: $position)';
+    return 'Song(name: $name, order: $order, position: $position)';
   }
 
   @override
@@ -652,6 +676,7 @@ class _$_Song implements _Song {
         (other.runtimeType == runtimeType &&
             other is _Song &&
             const DeepCollectionEquality().equals(other.name, name) &&
+            const DeepCollectionEquality().equals(other.order, order) &&
             const DeepCollectionEquality().equals(other.position, position));
   }
 
@@ -659,6 +684,7 @@ class _$_Song implements _Song {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(name),
+      const DeepCollectionEquality().hash(order),
       const DeepCollectionEquality().hash(position));
 
   @JsonKey(ignore: true)
@@ -673,12 +699,20 @@ class _$_Song implements _Song {
 }
 
 abstract class _Song implements Song {
-  factory _Song({required String name, int? position}) = _$_Song;
+  factory _Song({required String name, required int order, int? position}) =
+      _$_Song;
 
   factory _Song.fromJson(Map<String, dynamic> json) = _$_Song.fromJson;
 
   @override
   String get name;
+  @override
+
+  /// The order of the song when comparing.
+  ///
+  /// This is used to randomize the order and to avoid that the user finds
+  /// patterns in the list.
+  int get order;
   @override
 
   /// The rank of the song among all of the artist's songs.

@@ -47,10 +47,12 @@ Map<String, dynamic> _$$_AlbumToJson(_$_Album instance) => <String, dynamic>{
 
 _$_Song _$$_SongFromJson(Map<String, dynamic> json) => _$_Song(
       name: json['name'] as String,
+      order: json['order'] as int,
       position: json['position'] as int?,
     );
 
 Map<String, dynamic> _$$_SongToJson(_$_Song instance) => <String, dynamic>{
       'name': instance.name,
+      'order': instance.order,
       'position': instance.position,
     };

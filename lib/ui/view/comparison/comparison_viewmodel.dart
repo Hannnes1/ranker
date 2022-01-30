@@ -20,11 +20,19 @@ class ComparisonViewModel extends BaseViewModel {
 
   /// The artist with the songs to sort.
   final Artist artist;
-  
+
   String get progress => '$comparisonCount/${comparisonCount + unsorted}';
 
   /// Get all of the songs as a flat list.
-  List<Song> get songs => artist.albums.expand((album) => album.songs).toList();
+  ///
+  /// This list is sorted according to the randomized order numbers.
+  List<Song> get songs {
+    _songs ??= artist.albums.expand((album) => album.songs).toList()..sort((a, b) => a.order.compareTo(b.order));
+
+    return _songs!;
+  }
+
+  List<Song>? _songs;
 
   List<Song>? _sortedSongs;
 
@@ -96,21 +104,13 @@ class ComparisonViewModel extends BaseViewModel {
 
     // Create a new artist with updated song positions, if any.
     if (sortedList != null) {
-      updatedArtist = Artist(
-        name: artist.name,
-        winHistory: _winHistory,
-        albums: artist.albums
-            .map((album) => Album(
-                  name: album.name,
-                  songs: album.songs
-                      .map((song) => Song(
-                            name: song.name,
-                            position: sortedList.reversed.toList().indexOf(song.name),
-                          ))
-                      .toList(),
-                ))
-            .toList(),
-      );
+      updatedArtist = artist.copyWith(
+          winHistory: _winHistory,
+          albums: artist.albums
+              .map((e) => e.copyWith(
+                    songs: e.songs.map((e) => e.copyWith(position: sortedList.indexOf(e.name))).toList(),
+                  ))
+              .toList());
     }
 
     _fileIO.saveArtist(updatedArtist);

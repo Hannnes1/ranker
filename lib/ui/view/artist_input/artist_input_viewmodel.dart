@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:ranker/app/extenstions.dart';
 import 'package:ranker/models/json.dart';
@@ -25,6 +27,13 @@ class ArtistInputViewModel extends BaseViewModel {
 
   save() async {
     if (formKey.currentState!.validate()) {
+      final songNames = songControllers.expand((e) => e.text.split(_splitPattern)).toList();
+      
+      print(songNames.length);
+
+      // This list is used to sort the songs in a random order.
+      final orderNumbers = List.generate(songNames.length, (index) => index);
+
       final artist = Artist(
         name: artistController.text,
         albums: albumControllers
@@ -33,8 +42,11 @@ class ArtistInputViewModel extends BaseViewModel {
                   songs: songControllers[index]
                       .text
                       .split(_splitPattern)
-                      .map((song) => Song(
-                            name: song,
+                      .mapWithIndex((i, song) => Song(
+                            name: songNames[i],
+                            // Select a random order number, and remove it from the list.
+                            order: orderNumbers.removeAt(
+                                Random().nextInt(orderNumbers.length)),
                           ))
                       .toList(),
                 ))
