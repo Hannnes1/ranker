@@ -20,6 +20,8 @@ class ComparisonViewModel extends BaseViewModel {
 
   /// The artist with the songs to sort.
   final Artist artist;
+  
+  String get progress => '$comparisonCount/${comparisonCount + unsorted}';
 
   /// Get all of the songs as a flat list.
   List<Song> get songs => artist.albums.expand((album) => album.songs).toList();

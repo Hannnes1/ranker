@@ -17,7 +17,10 @@ class ComparisonView extends StatelessWidget {
       viewModelBuilder: () => ComparisonViewModel(artist),
       onModelReady: (model) => model.init(),
       builder: (context, model, child) => Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: Text(model.progress),
+          centerTitle: true,
+        ),
         body: Center(
           child: model.isBusy
               ? const CircularProgressIndicator()
