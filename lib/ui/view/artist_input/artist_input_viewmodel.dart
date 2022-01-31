@@ -29,8 +29,6 @@ class ArtistInputViewModel extends BaseViewModel {
     if (formKey.currentState!.validate()) {
       final songNames = songControllers.expand((e) => e.text.split(_splitPattern)).toList();
       
-      print(songNames.length);
-
       // This list is used to sort the songs in a random order.
       final orderNumbers = List.generate(songNames.length, (index) => index);
 
@@ -42,8 +40,9 @@ class ArtistInputViewModel extends BaseViewModel {
                   songs: songControllers[index]
                       .text
                       .split(_splitPattern)
-                      .mapWithIndex((i, song) => Song(
-                            name: songNames[i],
+                      .map((song) => Song(
+                            // Song names are in the same order as the albums, so removeAt(0) works.
+                            name: songNames.removeAt(0),
                             // Select a random order number, and remove it from the list.
                             order: orderNumbers.removeAt(
                                 Random().nextInt(orderNumbers.length)),
