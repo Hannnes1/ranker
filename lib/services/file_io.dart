@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:external_path/external_path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ranker/models/json.dart';
 
@@ -41,19 +42,19 @@ class FileIO {
 
   /// Get the path to the directory where the local JSON file is stored.
   Future<String> get _localPath async {
-    Directory? directory;
+    String? directory;
     if (Platform.isIOS) {
       // TODO: Make this available to the user.
-      directory = await getApplicationDocumentsDirectory();
+      directory = (await getApplicationDocumentsDirectory()).path;
     } else if (Platform.isAndroid) {
-      directory = await getExternalStorageDirectory();
+      directory = await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOCUMENTS);
     }
 
     if (directory == null) {
       // TODO: Handle this error with a dialog.
-      throw Exception('Could not get directory.');
+      throw Exception('Could not get local path.');
     } else {
-      return directory.path;
+      return directory;
     }
   }
 

@@ -39,6 +39,7 @@ dependencies:
   path_provider: ^2.0.8
   freezed_annotation: ^1.1.0
   json_annotation: ^4.4.0
+  external_path: ^1.0.1
 
 dev_dependencies:
   flutter_test:
