@@ -111,6 +111,8 @@ class ComparisonViewModel extends BaseViewModel {
                     songs: e.songs.map((e) => e.copyWith(position: sortedList.indexOf(e.name))).toList(),
                   ))
               .toList());
+    }else{
+      updatedArtist = artist.copyWith(winHistory: _winHistory);
     }
 
     _fileIO.saveArtist(updatedArtist);
