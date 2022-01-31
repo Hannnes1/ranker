@@ -53,6 +53,7 @@ class ComparisonViewModel extends BaseViewModel {
 
   /// Get the first songs to compare.
   void init() {
+    comparisonCount = _winHistory.length;
     _getNewSongs();
   }
 
