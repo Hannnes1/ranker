@@ -25,11 +25,19 @@ class HomeView extends StatelessWidget {
             ),
           ],
         ),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: model.signIn,
-            child: const Text('Sign in'),
-          ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+              onPressed: model.signIn,
+              child: const Text('Sign in'),
+            ),
+            ElevatedButton(
+              onPressed: model.openSort,
+              child: const Text('Sort'),
+            ),
+          ],
         ),
       ),
     );

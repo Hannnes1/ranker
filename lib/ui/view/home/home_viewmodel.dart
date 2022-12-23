@@ -17,4 +17,8 @@ class HomeViewModel extends BaseViewModel {
   Future<void> openProfile() async {
     await _navigationService.navigateToProfileView();
   }
+
+  Future<void> openSort() async {
+    await _navigationService.navigateToSortView();
+  }
 }

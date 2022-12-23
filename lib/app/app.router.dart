@@ -9,8 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:ranker/ui/view/home/home_view.dart' as _i2;
 import 'package:ranker/ui/view/profile/profile_view.dart' as _i4;
 import 'package:ranker/ui/view/sign_in/sign_in_view.dart' as _i3;
+import 'package:ranker/ui/view/sort/sort_view.dart' as _i5;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i5;
+import 'package:stacked_services/stacked_services.dart' as _i6;
 
 class Routes {
   static const homeView = '/';
@@ -19,10 +20,13 @@ class Routes {
 
   static const profileView = '/profile-view';
 
+  static const sortView = '/sort-view';
+
   static const all = <String>{
     homeView,
     signInView,
     profileView,
+    sortView,
   };
 }
 
@@ -39,6 +43,10 @@ class StackedRouter extends _i1.RouterBase {
     _i1.RouteDef(
       Routes.profileView,
       page: _i4.ProfileView,
+    ),
+    _i1.RouteDef(
+      Routes.sortView,
+      page: _i5.SortView,
     ),
   ];
 
@@ -61,6 +69,12 @@ class StackedRouter extends _i1.RouterBase {
         settings: data,
       );
     },
+    _i5.SortView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => const _i5.SortView(),
+        settings: data,
+      );
+    },
   };
 
   @override
@@ -69,7 +83,7 @@ class StackedRouter extends _i1.RouterBase {
   Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
 }
 
-extension NavigatorStateExtension on _i5.NavigationService {
+extension NavigatorStateExtension on _i6.NavigationService {
   Future<dynamic> navigateToHomeView([
     int? routerId,
     bool preventDuplicates = true,
@@ -106,6 +120,20 @@ extension NavigatorStateExtension on _i5.NavigationService {
         transition,
   ]) async {
     return navigateTo<dynamic>(Routes.profileView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToSortView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.sortView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
