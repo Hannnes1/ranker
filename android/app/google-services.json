@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "671162613596",
+    "project_id": "ranker-f37f3",
+    "storage_bucket": "ranker-f37f3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:671162613596:android:3acee79e3a853df7948b99",
+        "android_client_info": {
+          "package_name": "com.hultergard.ranker.ranker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "671162613596-b92appro847in5eur0jmubfnqf5qakqt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hultergard.ranker.ranker",
+            "certificate_hash": "22a59ea71e781964740f1801520f98393cd3527b"
+          }
+        },
+        {
+          "client_id": "671162613596-b9ldt2i4on224msb6n7s86psgi4rgl1c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hultergard.ranker.ranker",
+            "certificate_hash": "bf2a2a9e8e0815f38a8badc8e4e6b50ad3ba6808"
+          }
+        },
+        {
+          "client_id": "671162613596-7vm5o3g427bpuncgskpb8n7pp3cvl78g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL1o68s7Ap3xNasE0HBFIYBPbAsb6F9_o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "671162613596-7vm5o3g427bpuncgskpb8n7pp3cvl78g.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "671162613596-dneu3le3m9s873qo07fl91qotf8ns55e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hultergard.ranker.ranker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
