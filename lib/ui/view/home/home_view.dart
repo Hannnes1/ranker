@@ -34,6 +34,10 @@ class HomeView extends StatelessWidget {
               child: const Text('Sign in'),
             ),
             ElevatedButton(
+              onPressed: model.openImport,
+              child: const Text('Import'),
+            ),
+            ElevatedButton(
               onPressed: model.openSort,
               child: const Text('Sort'),
             ),

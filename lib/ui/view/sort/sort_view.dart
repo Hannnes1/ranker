@@ -3,12 +3,19 @@ import 'package:ranker/ui/view/sort/sort_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 
 class SortView extends StatelessWidget {
-  const SortView({super.key});
+  const SortView({
+    super.key,
+    required this.listId,
+  });
+
+  final String listId;
 
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<SortViewModel>.reactive(
-      viewModelBuilder: () => SortViewModel(),
+      viewModelBuilder: () => SortViewModel(
+        listId: listId,
+      ),
       onModelReady: (model) => model.init(),
       builder: (context, model, child) => Scaffold(
         appBar: AppBar(

@@ -10,6 +10,7 @@ import 'package:stacked_core/stacked_core.dart';
 import 'package:stacked_services/src/navigation/navigation_service.dart';
 
 import '../services/auth_service.dart';
+import '../services/file_service.dart';
 
 final locator = StackedLocator.instance;
 
@@ -22,4 +23,5 @@ Future<void> setupLocator(
 // Register dependencies
   locator.registerLazySingleton(() => NavigationService());
   locator.registerLazySingleton(() => AuthService());
+  locator.registerLazySingleton(() => FileService());
 }

@@ -1,31 +1,45 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:ranker/models/user_list.dart';
 import 'package:stacked/stacked.dart';
 
 class SortViewModel extends BaseViewModel {
+  SortViewModel({
+    required this.listId,
+  });
+
   final StreamController<int> _selections = StreamController.broadcast();
 
-  String? _value1;
-  String? _value2;
+  /// The ID of the list to sort.
+  final String listId;
 
-  String get value1 => _value1 ?? '';
-  String get value2 => _value2 ?? '';
+  ListItem? _item1;
+  ListItem? _item2;
+
+  String get value1 => _item1?.value ?? '';
+  String get value2 => _item2?.value ?? '';
 
   int? _remainingComparisons;
 
   String get remainingComparisons => _remainingComparisons?.toString() ?? '';
 
   Future<void> init() async {
-    final array = [5, 8, 1, 0, 3, 9, 21, 10, 4, 100, 50, 80, 40];
+    final listDoc = userListsRef.doc(listId);
+    final listToSort = (await listDoc.items.get()).docs.map((e) => e.data).toList();
 
-    await _binaryInsertionSort(array);
+    // Sort the list, and place items without an index last.
+    listToSort.sort((a, b) {
+      return a.index?.compareTo(b.index ?? double.maxFinite) ?? 1;
+    });
 
-    _value1 = null;
-    _value2 = null;
+    await _binaryInsertionSort(listToSort);
+
+    _item1 = null;
+    _item2 = null;
     notifyListeners();
 
-    print(array);
+    print(listToSort.map((e) => e.value));
   }
 
   @override
@@ -41,31 +55,38 @@ class SortViewModel extends BaseViewModel {
     _selections.add(selection);
   }
 
-  Future<void> _binaryInsertionSort(List<int> array) async {
-    for (int i = 1; i < array.length; i++) {
-      int x = array[i];
-      int left = 0;
-      int right = i - 1;
+  Future<void> _binaryInsertionSort(List<ListItem> list) async {
+    final sortedCount = list.where((e) => e.index != null).length;
 
-      final unsortedLength = array.length - i;
+    // The lenght of the sorted list should always be at least one, since the first item
+    // can be considered sorted, if all items are unsorted..
+    for (var i = max(sortedCount, 1); i < list.length; i++) {
+      final x = list[i];
+      var left = 0;
+      var right = i - 1;
 
-      int splits = 0;
+      final unsortedLength = list.length - i;
+
+      var splits = 0;
       // Find the index where x should be inserted
       while (left <= right) {
-        _remainingComparisons = (unsortedLength * (log(unsortedLength) / log(2))).round() + i ~/ 2 - ++splits;
+        // This is a rough estimation of the number of remaining comparisons.
+        // It might not be the most correct way to do the estimation, but it is good enough.
+        _remainingComparisons = (unsortedLength * (log(unsortedLength) / log(2))).round() + i ~/ 2 - splits++;
 
-        int mid = (left + right) ~/ 2;
+        final mid = (left + right) ~/ 2;
 
-        _value1 = x.toString();
-        _value2 = array[mid].toString();
+        _item1 = x;
+        _item2 = list[mid];
         notifyListeners();
 
         late int selection;
         try {
           selection = await _selections.stream.first;
-          // Will fail if the user leaves the page before a value is selected. Safe to ignore.
-          // ignore: empty_catches
-        } catch (e) {}
+          // Will fail if the user leaves the page before a value is selected.
+        } catch (e) {
+          return;
+        }
 
         if (selection < 0) {
           right = mid - 1;
@@ -75,12 +96,14 @@ class SortViewModel extends BaseViewModel {
       }
 
       // Shift elements to make room for x
-      for (int j = i - 1; j >= left; j--) {
-        array[j + 1] = array[j];
+      for (var j = i - 1; j >= left; j--) {
+        list[j + 1] = list[j];
       }
 
       // Insert x at the correct position
-      array[left] = x;
+      list[left] = x;
+
+      await userListsRef.doc(listId).items.doc(x.id).update(index: left);
     }
   }
 }
