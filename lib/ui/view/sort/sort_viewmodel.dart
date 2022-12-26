@@ -95,15 +95,20 @@ class SortViewModel extends BaseViewModel {
         }
       }
 
+      setBusy(true);
+
       // Shift elements to make room for x
       for (var j = i - 1; j >= left; j--) {
         list[j + 1] = list[j];
+        await userListsRef.doc(listId).items.doc(list[j].id).update(index: j + 1);
       }
 
       // Insert x at the correct position
       list[left] = x;
 
       await userListsRef.doc(listId).items.doc(x.id).update(index: left);
+
+      setBusy(false);
     }
   }
 }
