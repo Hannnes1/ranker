@@ -21,24 +21,42 @@ class SortView extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Sort'),
         ),
-        body: Column(
+        body: Stack(
           children: [
-            Text(model.remainingComparisons),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => model.select(-1),
-                    child: Text(model.value1),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(model.remainingComparisons),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Flexible(
+                        child: ElevatedButton(
+                          onPressed: () => model.select(-1),
+                          child: Text(model.value1),
+                        ),
+                      ),
+                      Flexible(
+                        child: ElevatedButton(
+                          onPressed: () => model.select(1),
+                          child: Text(model.value2),
+                        ),
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: () => model.select(1),
-                    child: Text(model.value2),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+            if (model.isBusy)
+              Positioned.fill(
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
